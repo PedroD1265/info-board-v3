@@ -1,1 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Info Board Admin</title>
+  <link rel="stylesheet" href="../styles/base.css">
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="header" style="border-radius:14px;">
+      <div class="title">
+        <div class="badge">⚙</div>
+        <div>ADMIN</div>
+      </div>
+      <div class="meta">
+        <div class="muted">InfoBoard v3</div>
+        <div><a href="../" style="color:#cfcfcf;">Abrir público</a></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="row">
+        <div class="col">
+          <div class="muted" id="authState">No autenticado</div>
+          <div class="muted" id="authEmail"></div>
+        </div>
+        <div>
+          <button class="btn primary" id="btnLogin">Entrar con Google</button>
+          <button class="btn" id="btnLogout" style="display:none;">Salir</button>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #2b2b2b;margin:14px 0;">
+
+      <div id="adminPanel" style="display:none;">
+        <div class="row">
+          <div class="col">
+            <label>Slot</label>
+            <select id="slotSelect"></select>
+          </div>
+
+          <div class="col">
+            <label>Archivo</label>
+            <input id="fileInput" type="file" />
+            <div class="muted" id="fileHint" style="margin-top:6px;"></div>
+          </div>
+
+          <div class="col">
+            <label>Duración</label>
+            <select id="durationSelect"></select>
+            <div class="row" style="margin-top:10px;">
+              <label style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;">
+                <input type="checkbox" id="useVideoDuration">
+                Usar duración real del video (solo video)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <button class="btn primary" id="btnUpload">Subir / Reemplazar</button>
+          <button class="btn" id="btnToggle">Activar/Desactivar</button>
+          <button class="btn danger" id="btnDelete">Borrar archivo del slot</button>
+          <button class="btn" id="btnCreateManifest">Crear manifest (si no existe)</button>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div class="progress"><div id="progressBar"></div></div>
+          <div class="muted" id="progressText" style="margin-top:8px;"></div>
+        </div>
+
+        <div class="muted" style="margin-top:12px;">
+          Recomendación de peso: imágenes 0.2–2MB (JPG), videos 5–25MB (MP4 H.264/AAC). Límite actual en rules: 50MB.
+        </div>
+
+        <div class="slotList" id="slotList"></div>
+      </div>
+
+      <div id="authDenied" style="display:none; margin-top:12px;" class="error"></div>
+    </div>
+  </div>
+
+  <script type="module" src="../scripts/admin.js"></script>
+</body>
+</html>
 
