@@ -16,7 +16,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
 
 export const firebaseConfig = {
-  apiKey: "AIzaSyA3f-IrD6O_k13Lleru3vNG1qFgBGJg_0Q",
+  apiKey: "AIzaSyA3f-IdR6O_kl3LLeru3vNG1qFgBGJg_O0",
   authDomain: "info-board-v3.firebaseapp.com",
   projectId: "info-board-v3",
   storageBucket: "info-board-v3.firebasestorage.app",
