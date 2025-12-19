@@ -283,15 +283,25 @@ async function toggleSlot(){
 }
 
 async function deleteSlotFile(){
-  await ensureLoggedAdmin();
-  const id = slotSelect.value;
-  const slot = findSlot(id);
-  if (!slot?.path) throw new Error("No hay archivo asignado en este slot.");
+  const slotId = slotSelect.value;
+  const slot = state.slots.find(s => s.id === slotId);
+  if (!slot || !slot.path) {
+    setProgress(0, "Este slot no tiene archivo para borrar.");
+    return;
+  }
 
-  if (!confirm(`¿Borrar el archivo del slot ${id}?`)) return;
+  // seguridad extra: nunca borrar manifest
+  if (slot.path.endsWith("manifest.json")) {
+    setProgress(0, "Bloqueado: no se borra manifest.");
+    return;
+  }
 
-  await deletePath(slot.path);
+  setProgress(10, "Borrando archivo…");
 
+  // ✅ esto es lo clave
+  await deleteObject(ref(storage, slot.path));
+
+  // Actualiza el manifest para dejar ese slot vacío y desactivado
   slot.enabled = false;
   slot.path = null;
   slot.contentType = null;
@@ -299,12 +309,12 @@ async function deleteSlotFile(){
   slot.cacheBuster = null;
   slot.updatedAt = new Date().toISOString();
 
-  updateManifestMeta();
-  await writeManifest(manifest);
+  await saveManifest(state); // o tu función real de “updateManifest”
 
-  setProgress(0, `${id}: archivo borrado y slot desactivado.`);
-  await loadManifest();
+  setProgress(100, "Archivo borrado + manifest actualizado.");
+  await loadManifestAndRender(); // o refrescar UI como lo tengas
 }
+
 
 // ---- auth wiring ----
 btnLogin.addEventListener("click", async () => {
