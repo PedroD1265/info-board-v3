@@ -283,8 +283,11 @@ async function toggleSlot(){
 }
 
 async function deleteSlotFile(){
+  await ensureLoggedAdmin();
+
   const slotId = slotSelect.value;
-  const slot = state.slots.find(s => s.id === slotId);
+  const slot = findSlot(slotId);
+
   if (!slot || !slot.path) {
     setProgress(0, "Este slot no tiene archivo para borrar.");
     return;
@@ -296,12 +299,12 @@ async function deleteSlotFile(){
     return;
   }
 
-  setProgress(10, "Borrando archivo…");
+  setProgress(10, `Borrando ${slotId}…`);
 
-  // ✅ esto es lo clave
+  // ✅ Borrar archivo con SDK (no fetch DELETE)
   await deleteObject(ref(storage, slot.path));
 
-  // Actualiza el manifest para dejar ese slot vacío y desactivado
+  // ✅ Limpiar slot en manifest
   slot.enabled = false;
   slot.path = null;
   slot.contentType = null;
@@ -309,12 +312,12 @@ async function deleteSlotFile(){
   slot.cacheBuster = null;
   slot.updatedAt = new Date().toISOString();
 
-  await saveManifest(state); // o tu función real de “updateManifest”
+  updateManifestMeta();
+  await writeManifest(manifest);
 
-  setProgress(100, "Archivo borrado + manifest actualizado.");
-  await loadManifestAndRender(); // o refrescar UI como lo tengas
+  setProgress(100, `${slotId} borrado. Manifest actualizado.`);
+  await loadManifest();
 }
-
 
 // ---- auth wiring ----
 btnLogin.addEventListener("click", async () => {
