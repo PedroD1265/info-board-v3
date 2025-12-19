@@ -5,7 +5,7 @@ import {
   ref,
   uploadBytesResumable,
   getMetadata,
-  getDownloadURL
+  deleteObject,
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
 
 import {
@@ -13,8 +13,6 @@ import {
   defaultManifest,
   readManifest,
   writeManifest,
-  deletePath,
-  MANIFEST_PATH
 } from "./manifest.js";
 
 const ADMIN_EMAIL = "pedelvi@gmail.com";
@@ -111,6 +109,7 @@ function renderSlots(){
     const pill = s.enabled ? `<span class="pill on">ON</span>` : `<span class="pill off">OFF</span>`;
     const path = s.path || "—";
     const size = s.size ? `${bytesToMB(s.size)} MB` : "—";
+
     const dur = s.kind === "video"
       ? (s.useVideoDuration ? "duración real" : `${Math.round((s.durationMs||10000)/1000)}s`)
       : `${Math.round((s.durationMs||10000)/1000)}s`;
@@ -128,6 +127,8 @@ function renderSlots(){
 }
 
 async function loadManifest(){
+  // Si falla la lectura, usamos defaultManifest() SOLO para que la UI no reviente,
+  // pero seguimos mostrando el botón de crear manifest.
   try{
     manifest = await readManifest();
     btnCreateManifest.style.display = "none";
@@ -137,11 +138,10 @@ async function loadManifest(){
   }
 
   if (!manifest){
-    // fallback local (solo para UI)
     manifest = defaultManifest();
   }
 
-  // asegura que existan todos los slots
+  // asegura que existan todos los slots (merge)
   const map = new Map((manifest.slots||[]).map(s => [s.id, s]));
   manifest.slots = SLOT_DEFS.map(def => map.get(def.id) || ({
     id:def.id,
@@ -150,7 +150,7 @@ async function loadManifest(){
     path:null,
     contentType:null,
     size:null,
-    durationMs: def.kind === "video" ? 10000 : 10000,
+    durationMs: 10000,
     useVideoDuration: def.kind === "video",
     cacheBuster:null,
     updatedAt:null
@@ -225,7 +225,7 @@ async function uploadToSlot(){
   const durationSec = parseInt(durationSelect.value, 10);
   const useReal = (kind === "video") ? !!useVideoDuration.checked : false;
 
-  // cache: 1 día (bajo consumo) + buster por generación (actualización inmediata sin refresh manual)
+  // cache: 1 día + buster por generation
   const metadata = {
     contentType: file.type,
     cacheControl: "public, max-age=86400"
@@ -301,10 +301,10 @@ async function deleteSlotFile(){
 
   setProgress(10, `Borrando ${slotId}…`);
 
-  // ✅ Borrar archivo con SDK (no fetch DELETE)
+  // ✅ borrar objeto
   await deleteObject(ref(storage, slot.path));
 
-  // ✅ Limpiar slot en manifest
+  // ✅ limpiar slot + actualizar manifest
   slot.enabled = false;
   slot.path = null;
   slot.contentType = null;
@@ -337,18 +337,22 @@ btnLogout.addEventListener("click", async () => {
 
 // ---- UI wiring ----
 slotSelect.addEventListener("change", syncUIFromSelected);
+
 btnUpload.addEventListener("click", async () => {
   try{ await uploadToSlot(); }
   catch(e){ setProgress(0, "Error: " + (e?.message || e)); }
 });
+
 btnToggle.addEventListener("click", async () => {
   try{ await toggleSlot(); }
   catch(e){ setProgress(0, "Error: " + (e?.message || e)); }
 });
+
 btnDelete.addEventListener("click", async () => {
   try{ await deleteSlotFile(); }
   catch(e){ setProgress(0, "Error: " + (e?.message || e)); }
 });
+
 btnCreateManifest.addEventListener("click", async () => {
   try{ await createManifestInStorage(); }
   catch(e){ setProgress(0, "Error: " + (e?.message || e)); }
@@ -389,4 +393,3 @@ onAuth(async (user) => {
 
   await loadManifest();
 });
-
