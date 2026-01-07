@@ -354,4 +354,8 @@ input[type="file"], select{
 }
 .pill.on{ border-color:#235a23; color:var(--ok); }
 .pill.off{ border-color:#5a2222; color:#ffb3b3; }
-
+/* PROYECTOS: columna "PROYECTOS" (4ta) alineada a la derecha */
+#boardScreen .board.first table tbody td:nth-child(4),
+#boardScreen .board.first table thead th:nth-child(4){
+  text-align: right;
+}
