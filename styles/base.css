@@ -359,3 +359,28 @@ input[type="file"], select{
 #boardScreen .board.first table thead th:nth-child(4){
   text-align: right;
 }
+html, body{
+  height: 100%;
+  overflow: hidden; /* evita scroll que en TV se siente como recorte */
+}
+
+/* menos márgenes exteriores (el margin:24px suele causar recorte en TV) */
+.wrap{
+  margin: 0 auto;
+  padding: 12px 14px;
+  max-width: 100%;
+}
+
+/* cuando la pantalla es baja (típico 720p/TV) compactamos */
+@media (max-height: 800px){
+  .header{ padding: 12px 14px; }
+  .board{ padding: 12px; }
+  table{ font-size: 16px; }
+  th, td{ padding: 10px 10px; }
+}
+
+@media (max-height: 720px){
+  table{ font-size: 14px; }
+  th, td{ padding: 8px 8px; }
+}
+
