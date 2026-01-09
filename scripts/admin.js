@@ -228,7 +228,7 @@ async function uploadToSlot(){
   // cache: 1 día + buster por generation
   const metadata = {
     contentType: file.type,
-    cacheControl: "public, max-age=86400"
+    cacheControl: "public, max-age=31536000, immutable"
   };
 
   setProgress(0, `Subiendo ${id}… (${bytesToMB(file.size)} MB)`);
