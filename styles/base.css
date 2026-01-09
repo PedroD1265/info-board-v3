@@ -383,4 +383,17 @@ html, body{
   table{ font-size: 14px; }
   th, td{ padding: 8px 8px; }
 }
+:root{
+  --safe-bottom: 32px; /* sube a 48px si sigue cortando */
+}
+
+.wrap{
+  padding-bottom: var(--safe-bottom);
+}
+
+/* En pantallas bajas (TVs 720p o con overscan fuerte) */
+@media (max-height: 800px){
+  :root{ --safe-bottom: 48px; }
+}
+
 
